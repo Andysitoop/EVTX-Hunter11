@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EVTX Hunter</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #111111;
+      --muted: #666666;
+      --card-bg: #ffffff;
+      --border: #dddddd;
+      --input-bg: #ffffff;
+      --input-border: #cccccc;
+      --btn-bg: #111111;
+      --btn-fg: #ffffff;
+      --btn-hover: #333333;
+      --btn-secondary: #444444;
+      --btn-secondary-hover: #555555;
+      --danger: #b00020;
+      --danger-hover: #c62828;
+      --progress-bg: #eeeeee;
+    }
+    [data-theme="dark"] {
+      --bg: #0b0f14;
+      --fg: #e6e6e6;
+      --muted: #a7a7a7;
+      --card-bg: #0f1620;
+      --border: #223042;
+      --input-bg: #0b0f14;
+      --input-border: #2a3a50;
+      --btn-bg: #e6e6e6;
+      --btn-fg: #0b0f14;
+      --btn-hover: #cfcfcf;
+      --btn-secondary: #2a3a50;
+      --btn-secondary-hover: #334863;
+      --danger: #ff5c77;
+      --danger-hover: #ff7a90;
+      --progress-bg: #223042;
+    }
+
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; background: var(--bg); color: var(--fg); }
+    .container { max-width: 980px; margin: 0 auto; }
+    .card { border: 1px solid var(--border); background: var(--card-bg); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    label { display: block; font-weight: 600; margin: 10px 0 6px; }
+    input { width: 100%; padding: 10px; border: 1px solid var(--input-border); border-radius: 8px; background: var(--input-bg); color: var(--fg); }
+    select { background: var(--input-bg); color: var(--fg); border: 1px solid var(--input-border); border-radius: 8px; }
+    button { padding: 10px 14px; border: 0; border-radius: 8px; background: var(--btn-bg); color: var(--btn-fg); cursor: pointer; }
+    button:hover { background: var(--btn-hover); }
+    button.secondary { background: var(--btn-secondary); color: var(--btn-fg); }
+    button.secondary:hover { background: var(--btn-secondary-hover); }
+    button.danger { background: var(--danger); color: #fff; }
+    button.danger:hover { background: var(--danger-hover); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .hint { color: var(--muted); font-size: 13px; }
+    .flash { background: var(--card-bg); border: 1px solid var(--border); padding: 10px 12px; border-radius: 8px; margin-bottom: 10px; }
+    .progress-wrap { margin-top: 12px; }
+    .progress-bar { width: 100%; height: 14px; background: var(--progress-bg); border-radius: 999px; overflow: hidden; }
+    .progress-bar > div { height: 100%; width: 0%; background: #111; transition: width 250ms ease; }
+    .progress-bar.indeterminate > div { width: 35%; animation: indeterminate 1.1s infinite linear; }
+    @keyframes indeterminate {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(320%); }
+    }
+    .progress-meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: var(--fg); }
+    .muted { color: var(--muted); font-size: 13px; }
+    ul { padding-left: 18px; }
+    .file-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .file-actions { display: flex; gap: 8px; }
+    button.small { padding: 6px 10px; border-radius: 8px; font-size: 13px; }
+    a { color: #0a58ca; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="container" id="app" data-job-id="{{ job_id or '' }}">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <h1 style="margin:0;">EVTX Hunter</h1>
+      <button type="button" class="secondary" id="themeToggle" style="padding:8px 12px;">Tema: Claro</button>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="flash">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card">
+      <h2>Procesar evidencias</h2>
+      <form method="post" action="/run" id="runForm">
+        <div class="row">
+          <div>
+            <label>InputRoot</label>
+            <input name="input_root" value="{{ input_root }}" />
+            <div class="hint">Debe contener carpetas: <code>Evidencia 1</code>, <code>Evidencia 2</code>, etc.</div>
+          </div>
+          <div>
+            <label>OutputRoot</label>
+            <input name="output_root" value="{{ output_root }}" />
+            <div class="hint">Aquí se generan todos los CSV.</div>
+          </div>
+        </div>
+
+        <label>MaxEvents (opcional)</label>
+        <input name="max_events" value="0" />
+        <div class="hint">0 = sin límite (puede tardar más).</div>
+
+        <label>¿Qué log procesar?</label>
+        <select name="logs_choice" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+          <option value="all" selected>Todos</option>
+          <option value="security">Security (4688)</option>
+          <option value="powershell">PowerShell Operational (4103/4104/4105)</option>
+          <option value="sysmon">Sysmon Operational (1)</option>
+        </select>
+
+        <div style="margin-top: 10px;">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:600; margin:0;">
+            <input type="checkbox" name="include_xml" id="includeXml" />
+            Incluir XML en el CSV (más pesado / más lento)
+          </label>
+          <div class="hint">Recomendado: desactivado para mayor velocidad.</div>
+        </div>
+
+        <div style="margin-top: 12px;">
+          <button type="submit" id="runBtn">Ejecutar extracción</button>
+        </div>
+
+        <div style="margin-top: 10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="secondary" id="pauseBtn" style="display:none;">Pausar</button>
+          <button type="button" class="secondary" id="resumeBtn" style="display:none;">Reanudar</button>
+          <button type="button" class="danger" id="cancelBtn" style="display:none;">Cancelar</button>
+        </div>
+
+        <div class="progress-wrap" id="progressWrap" style="display:none;">
+          <div class="progress-bar"><div id="progressFill"></div></div>
+          <div class="progress-meta">
+            <div id="progressText">Preparando...</div>
+            <div id="progressPct">0%</div>
+          </div>
+          <div class="muted" id="progressDetail"></div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>CSV generados</h2>
+      {% if files %}
+        <ul>
+          {% for f in files %}
+            <li>
+              <div class="file-row">
+                <a href="/download/{{ f }}?output_root={{ output_root|urlencode }}">{{ f }}</a>
+                <div class="file-actions">
+                  <form method="post" action="/delete" class="delete-form" style="margin:0;">
+                    <input type="hidden" name="filename" value="{{ f }}" />
+                    <input type="hidden" name="output_root" value="{{ output_root }}" />
+                    <input type="hidden" name="input_root" value="{{ input_root }}" />
+                    <button type="submit" class="danger small">Eliminar</button>
+                  </form>
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="hint">Aún no hay CSV en el OutputRoot.</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Filtros</h2>
+      <ul>
+        <li>Security: EventID 4688</li>
+        <li>PowerShell Operational: EventID 4103, 4104, 4105</li>
+        <li>Sysmon Operational: EventID 1</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    const appEl = document.getElementById('app');
+    const jobIdRaw = appEl ? appEl.getAttribute('data-job-id') : '';
+    let jobId = (jobIdRaw && jobIdRaw.trim().length > 0) ? jobIdRaw.trim() : null;
+    const progressWrap = document.getElementById('progressWrap');
+    const progressFill = document.getElementById('progressFill');
+    const progressBar = progressFill ? progressFill.parentElement : null;
+    const progressText = document.getElementById('progressText');
+    const progressPct = document.getElementById('progressPct');
+    const progressDetail = document.getElementById('progressDetail');
+    const runBtn = document.getElementById('runBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme) {
+      const t = (theme === 'dark') ? 'dark' : 'light';
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      else document.documentElement.removeAttribute('data-theme');
+      if (themeToggle) themeToggle.textContent = `Tema: ${t === 'dark' ? 'Oscuro' : 'Claro'}`;
+    }
+
+    const savedTheme = localStorage.getItem('evtx_hunter_theme');
+    applyTheme(savedTheme || 'light');
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const next = isDark ? 'light' : 'dark';
+        localStorage.setItem('evtx_hunter_theme', next);
+        applyTheme(next);
+      });
+    }
+
+    async function postAction(url) {
+      try {
+        const res = await fetch(url, { method: 'POST' });
+        return await res.json();
+      } catch (e) {
+        return { ok: false, error: 'Error de red' };
+      }
+    }
+
+    if (pauseBtn) pauseBtn.addEventListener('click', async () => {
+      if (!jobId) return;
+      await postAction(`/api/pause/${jobId}`);
+      await poll();
+    });
+    if (resumeBtn) resumeBtn.addEventListener('click', async () => {
+      if (!jobId) return;
+      await postAction(`/api/resume/${jobId}`);
+      await poll();
+    });
+    if (cancelBtn) cancelBtn.addEventListener('click', async () => {
+      if (!jobId) return;
+      await postAction(`/api/cancel/${jobId}`);
+      await poll();
+    });
+
+    async function poll() {
+      if (!jobId) return;
+      try {
+        const res = await fetch(`/api/status/${jobId}`);
+        if (!res.ok) {
+          if (res.status === 404) {
+            jobId = null;
+            runBtn.disabled = false;
+            progressWrap.style.display = 'none';
+            if (progressBar) progressBar.classList.remove('indeterminate');
+            if (pauseBtn) pauseBtn.style.display = 'none';
+            if (resumeBtn) resumeBtn.style.display = 'none';
+            if (cancelBtn) cancelBtn.style.display = 'none';
+          }
+          return;
+        }
+        const data = await res.json();
+        if (!data.ok) return;
+
+        const st = data.status;
+        const p = data.progress || {};
+        const pct = (p.percent ?? 0);
+
+        progressWrap.style.display = 'block';
+        progressFill.style.width = `${pct}%`;
+        progressPct.textContent = `${pct}%`;
+
+        if (st === 'queued') {
+          runBtn.disabled = true;
+          progressText.textContent = 'En cola...';
+          if (progressBar) progressBar.classList.add('indeterminate');
+          if (pauseBtn) pauseBtn.style.display = 'none';
+          if (resumeBtn) resumeBtn.style.display = 'none';
+          if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        } else if (st === 'running') {
+          runBtn.disabled = true;
+          const ev = p.evidence || '';
+          const lg = p.log_kind || '';
+          const stage = p.stage || '';
+          const comp = p.computer || '';
+          const done = p.completed_tasks ?? 0;
+          const plan = p.planned_tasks ?? 0;
+          const reviewed = p.reviewed ?? 0;
+          const exported = p.exported ?? 0;
+
+          progressText.textContent = `Procesando (${done}/${plan})`;
+          progressDetail.textContent = `Equipo: ${comp} | Evidencia: ${ev} | Log: ${lg} | Etapa: ${stage} | Revisados: ${reviewed} | Exportados: ${exported}`;
+
+          if (progressBar) {
+            if ((done === 0) && (pct === 0)) progressBar.classList.add('indeterminate');
+            else progressBar.classList.remove('indeterminate');
+          }
+
+          if (pauseBtn) pauseBtn.style.display = 'inline-block';
+          if (resumeBtn) resumeBtn.style.display = 'none';
+          if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        } else if (st === 'paused') {
+          runBtn.disabled = true;
+          progressText.textContent = 'Pausado';
+          if (progressBar) progressBar.classList.add('indeterminate');
+          progressDetail.textContent = 'Extracción en pausa. Puedes reanudar o cancelar.';
+          if (pauseBtn) pauseBtn.style.display = 'none';
+          if (resumeBtn) resumeBtn.style.display = 'inline-block';
+          if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        } else if (st === 'cancelling') {
+          runBtn.disabled = true;
+          progressText.textContent = 'Cancelando...';
+          if (progressBar) progressBar.classList.add('indeterminate');
+          if (pauseBtn) pauseBtn.style.display = 'none';
+          if (resumeBtn) resumeBtn.style.display = 'none';
+          if (cancelBtn) cancelBtn.style.display = 'none';
+        } else if (st === 'cancelled') {
+          runBtn.disabled = false;
+          progressText.textContent = 'Cancelado';
+          if (progressBar) progressBar.classList.remove('indeterminate');
+          progressDetail.textContent = 'La extracción fue cancelada.';
+          if (pauseBtn) pauseBtn.style.display = 'none';
+          if (resumeBtn) resumeBtn.style.display = 'none';
+          if (cancelBtn) cancelBtn.style.display = 'none';
+        } else if (st === 'done') {
+          runBtn.disabled = false;
+          progressText.textContent = 'Completado';
+          if (progressBar) progressBar.classList.remove('indeterminate');
+          if (pauseBtn) pauseBtn.style.display = 'none';
+          if (resumeBtn) resumeBtn.style.display = 'none';
+          if (cancelBtn) cancelBtn.style.display = 'none';
+
+          const results = data.results || [];
+          const zeros = results.filter(r => (r.exported === 0));
+          const secWithCmd = results.filter(r => r.log === 'security' && r.cmdline_present === true);
+          const psWithSb = results.filter(r => r.log === 'powershell_operational' && r.scriptblock_present === true);
+          const psWithModule = results.filter(r => r.log === 'powershell_operational' && r.module_logging_present === true);
+
+          if (zeros.length > 0) {
+            progressDetail.textContent = `Aviso: hay CSV con 0 eventos exportados (${zeros.length}). Revisa si el EVTX no contiene esos IDs.`;
+          } else {
+            let note = 'Listo. Refresca la página para ver los CSV en la lista.';
+            if (results.some(r => r.log === 'security')) {
+              note += secWithCmd.length > 0
+                ? ' Security 4688: se detectó contenido en CommandLine.'
+                : ' Security 4688: no se detectó contenido en CommandLine.';
+            }
+            if (results.some(r => r.log === 'powershell_operational')) {
+              note += psWithSb.length > 0
+                ? ' PowerShell (Script Block Logging/4104): se detectó ScriptBlockText.'
+                : ' PowerShell (Script Block Logging/4104): no se detectó ScriptBlockText.';
+              note += psWithModule.length > 0
+                ? ' PowerShell (Module Logging/4103): se detectó Payload.'
+                : ' PowerShell (Module Logging/4103): no se detectó Payload.';
+              note += ' Transcription: normalmente se guarda en archivos .txt fuera del EVTX (no se detecta aquí).';
+            }
+            progressDetail.textContent = note;
+          }
+        } else if (st === 'error') {
+          runBtn.disabled = false;
+          progressText.textContent = 'Error';
+          progressDetail.textContent = data.error || 'Error desconocido';
+          if (progressBar) progressBar.classList.remove('indeterminate');
+          if (pauseBtn) pauseBtn.style.display = 'none';
+          if (resumeBtn) resumeBtn.style.display = 'none';
+          if (cancelBtn) cancelBtn.style.display = 'none';
+        }
+      } catch (e) {
+      }
+    }
+
+    if (jobId) {
+      progressWrap.style.display = 'block';
+      runBtn.disabled = true;
+      poll();
+      setInterval(poll, 1000);
+    }
+
+    document.querySelectorAll('.delete-form').forEach((form) => {
+      form.addEventListener('submit', (e) => {
+        const filename = form.querySelector('input[name="filename"]').value;
+        if (!confirm(`¿Eliminar ${filename}?`)) {
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
