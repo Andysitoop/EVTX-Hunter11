@@ -1,16 +1,26 @@
-# EVTX Extractor
+# EVTX Hunter
+
+![EVTX Hunter](image/logo.jpeg)
  
- Manual de usuario para extraer eventos específicos desde archivos `.evtx` y exportarlos a `.csv`.
+Manual de usuario para extraer eventos específicos desde archivos `.evtx` y exportarlos a `.csv`.
  
- El flujo recomendado es usar la **UI Web** (Flask). La **API** es opcional.
+El flujo recomendado es usar la **UI Web** (Flask). La **API** es opcional.
  
- ## Qué hace
+## Muestra (UI)
+ 
+![Muestra de la herramienta](image/muestra.jpg)
+ 
+## Creador
+ 
+Andysitoop
+ 
+## Qué hace
  
  - Procesa carpetas de evidencia dentro de `Input\`.
  - Genera CSV en `Salidacsv\` (o en la carpeta de salida que indiques).
  - Permite limitar eventos por archivo, incluir/excluir XML y elegir qué logs procesar.
  
- ## Guía rápida (UI)
+## Guía rápida (UI)
  
  1. Coloca tu evidencia en `Input\Evidencia 1\`, `Input\Evidencia 2\`, etc.
  2. Instala dependencias.

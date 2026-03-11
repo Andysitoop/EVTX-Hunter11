@@ -107,6 +107,11 @@ def index():
     )
 
 
+@app.get("/image/<path:filename>")
+def image_file(filename: str):
+    return send_from_directory(PROJECT_ROOT / "image", filename)
+
+
 @app.post("/run")
 def run_extract():
     input_root = Path(request.form.get("input_root") or str(DEFAULT_INPUT))
