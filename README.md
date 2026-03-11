@@ -1,6 +1,9 @@
 # EVTX Hunter
+<<<<<<< HEAD
 
 ![EVTX Hunter](image/logo.jpeg)
+=======
+>>>>>>> b24a9a4761b8a9b1aecbddcff07ce650c4488c39
  
 Manual de usuario para extraer eventos específicos desde archivos `.evtx` y exportarlos a `.csv`.
  
