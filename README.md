@@ -1,4 +1,4 @@
-# EVTX Extractor
+# EVTX Hunter
  
  Manual de usuario para extraer eventos específicos desde archivos `.evtx` y exportarlos a `.csv`.
  
