@@ -1,17 +1,15 @@
 # EVTX Hunter
-<<<<<<< HEAD
 
 ![EVTX Hunter](image/logo.jpeg)
-=======
->>>>>>> b24a9a4761b8a9b1aecbddcff07ce650c4488c39
- 
+
 Manual de usuario para extraer eventos específicos desde archivos `.evtx` y exportarlos a `.csv`.
- 
+
 El flujo recomendado es usar la **UI Web** (Flask). La **API** es opcional.
- 
+
 ## Muestra (UI)
- 
+
 ![Muestra de la herramienta](image/muestra.jpg)
+
  
 ## Creador
  
@@ -47,7 +45,7 @@ Andysitoop
  En cada `Evidencia N` coloca los EVTX. El extractor intenta encontrar los siguientes nombres (también acepta algunas variantes):
  
  - `Security.evtx` (o `Security`)
- - `Microsoft-Windows-PowerShell%4Operational.evtx`
+ - `Microsoft-Windows-PowerShell%4Operational.evtx` (o `Windows PowerShell.evtx`)
  - `Microsoft-Windows-Sysmon%4Operational.evtx` (o `Sysmon.evtx` / `Sysmon`)
  
  ## Instalación
@@ -79,6 +77,13 @@ Andysitoop
  ### 2) Configurar
  
  En la pantalla principal puedes ajustar:
+
+Notas de UI:
+
+- La interfaz está organizada en secciones: **Rutas**, **Filtros** y **Opciones**.
+- Puedes usar el botón **Limpiar rango** para borrar Inicio/Fin y procesar completo.
+- La UI muestra el motor usado al finalizar: `Motor: wevtutil` o `Motor: python-evtx`.
+- Tema visual tipo **Purple Team**.
  
  - **input_root**: carpeta raíz de evidencia (por defecto `./Input`).
    - Debe contener subcarpetas tipo `Evidencia 1`, `Evidencia 2`, etc.
@@ -89,6 +94,11 @@ Andysitoop
  - **max_events**: máximo de eventos exportados por cada EVTX.
    - `0` = sin límite.
    - Útil si solo quieres una muestra rápida o si los EVTX son muy grandes.
+ 
+ - **inicio/fin (opcional)**: rango de tiempo para filtrar eventos por `TimeCreated`.
+   - Se selecciona como: **fecha + hora + minuto + AM/PM**.
+   - Si dejas vacío Inicio o Fin, no se aplica ese límite.
+   - Se interpreta como **hora local** y se convierte internamente a UTC.
  
  - **include_xml**: incluye o no la columna `Xml`.
    - Activado: el CSV contiene el XML completo del evento (más peso/tamaño).
@@ -123,10 +133,16 @@ Andysitoop
    "input_root": "C:\\ruta\\al\\proyecto\\Input",
    "output_root": "C:\\ruta\\al\\proyecto\\Salidacsv",
    "max_events": 0,
+   "start_time": "2022-01-01T00:00:00",
+   "end_time": "2022-01-01T23:59:00",
    "include_xml": true,
    "logs_choice": "all"
  }'
  ```
+ 
+ Notas API:
+ 
+ - `start_time` y `end_time` se pueden enviar como ISO 8601. Si no incluyen zona horaria, se asumen como hora local.
  
  ## Resultados (qué CSV genera)
  
@@ -145,6 +161,15 @@ Andysitoop
  
  - La app genera nombres de archivo únicos si detecta colisiones en la carpeta de salida.
  - El flujo principal ya no depende del script PowerShell.
+ 
+ ## Rendimiento
+ 
+ Para acelerar la extracción manteniendo **100% exactitud**:
+ 
+ - Si estás en Windows, el extractor intenta usar **`wevtutil`** como motor rápido (cuando es posible) y hace fallback a **`python-evtx`** si falla.
+ - En la UI, al completar, se muestra un texto tipo `Motor: wevtutil` o `Motor: python-evtx`.
+ - `include_xml` aumenta el tamaño del CSV y puede volver la exportación más lenta.
+ - `max_events` ayuda a validar rápido (muestra) antes de extraer todo.
  
  ## Solución de problemas
  

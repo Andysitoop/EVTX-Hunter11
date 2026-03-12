@@ -6,47 +6,61 @@
   <title>EVTX Hunter</title>
   <style>
     :root {
-      --bg: #ffffff;
-      --fg: #111111;
-      --muted: #666666;
-      --card-bg: #ffffff;
-      --border: #dddddd;
-      --input-bg: #ffffff;
-      --input-border: #cccccc;
-      --btn-bg: #111111;
-      --btn-fg: #ffffff;
-      --btn-hover: #333333;
-      --btn-secondary: #444444;
-      --btn-secondary-hover: #555555;
-      --danger: #b00020;
-      --danger-hover: #c62828;
-      --progress-bg: #eeeeee;
-    }
-    [data-theme="dark"] {
+      --page-bg: radial-gradient(1200px circle at 10% 10%, rgba(124, 58, 237, 0.18), transparent 45%),
+                 radial-gradient(900px circle at 90% 20%, rgba(168, 85, 247, 0.14), transparent 40%),
+                 radial-gradient(900px circle at 30% 90%, rgba(59, 130, 246, 0.10), transparent 45%),
+                 #0b0f14;
       --bg: #0b0f14;
-      --fg: #e6e6e6;
-      --muted: #a7a7a7;
-      --card-bg: #0f1620;
-      --border: #223042;
-      --input-bg: #0b0f14;
-      --input-border: #2a3a50;
-      --btn-bg: #e6e6e6;
+      --fg: #e9e7ff;
+      --muted: rgba(233, 231, 255, 0.70);
+      --card-bg: rgba(15, 22, 32, 0.86);
+      --border: rgba(124, 58, 237, 0.35);
+      --input-bg: rgba(11, 15, 20, 0.60);
+      --input-border: rgba(124, 58, 237, 0.35);
+      --btn-bg: linear-gradient(135deg, #7c3aed, #a855f7);
       --btn-fg: #0b0f14;
-      --btn-hover: #cfcfcf;
-      --btn-secondary: #2a3a50;
-      --btn-secondary-hover: #334863;
+      --btn-hover: linear-gradient(135deg, #6d28d9, #9333ea);
+      --btn-secondary: rgba(124, 58, 237, 0.18);
+      --btn-secondary-hover: rgba(124, 58, 237, 0.28);
       --danger: #ff5c77;
       --danger-hover: #ff7a90;
-      --progress-bg: #223042;
+      --progress-bg: rgba(124, 58, 237, 0.18);
+      --accent: #a855f7;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    }
+    [data-theme="dark"] {
+      --page-bg: radial-gradient(1200px circle at 10% 10%, rgba(124, 58, 237, 0.18), transparent 45%),
+                 radial-gradient(900px circle at 90% 20%, rgba(168, 85, 247, 0.14), transparent 40%),
+                 radial-gradient(900px circle at 30% 90%, rgba(59, 130, 246, 0.10), transparent 45%),
+                 #070a0f;
+      --bg: #070a0f;
+      --fg: #efeaff;
+      --muted: rgba(239, 234, 255, 0.72);
+      --card-bg: rgba(10, 12, 18, 0.78);
+      --border: rgba(168, 85, 247, 0.35);
+      --input-bg: rgba(7, 10, 15, 0.70);
+      --input-border: rgba(168, 85, 247, 0.35);
+      --btn-bg: linear-gradient(135deg, #a855f7, #7c3aed);
+      --btn-fg: #070a0f;
+      --btn-hover: linear-gradient(135deg, #9333ea, #6d28d9);
+      --btn-secondary: rgba(168, 85, 247, 0.16);
+      --btn-secondary-hover: rgba(168, 85, 247, 0.26);
+      --danger: #ff5c77;
+      --danger-hover: #ff7a90;
+      --progress-bg: rgba(168, 85, 247, 0.18);
+      --accent: #c084fc;
+      --shadow: 0 18px 55px rgba(0, 0, 0, 0.55);
     }
 
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; background: var(--bg); color: var(--fg); }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; background: var(--page-bg); color: var(--fg); }
     .container { max-width: 980px; margin: 0 auto; }
-    .card { border: 1px solid var(--border); background: var(--card-bg); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .card { border: 1px solid var(--border); background: var(--card-bg); border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
     label { display: block; font-weight: 600; margin: 10px 0 6px; }
-    input { width: 100%; padding: 10px; border: 1px solid var(--input-border); border-radius: 8px; background: var(--input-bg); color: var(--fg); }
-    select { background: var(--input-bg); color: var(--fg); border: 1px solid var(--input-border); border-radius: 8px; }
-    button { padding: 10px 14px; border: 0; border-radius: 8px; background: var(--btn-bg); color: var(--btn-fg); cursor: pointer; }
+    input { width: 100%; padding: 10px; border: 1px solid var(--input-border); border-radius: 10px; background: var(--input-bg); color: var(--fg); }
+    input:focus { outline: none; border-color: rgba(168, 85, 247, 0.70); box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.20); }
+    select { background: var(--input-bg); color: var(--fg); border: 1px solid var(--input-border); border-radius: 10px; }
+    select:focus { outline: none; border-color: rgba(168, 85, 247, 0.70); box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.20); }
+    button { padding: 10px 14px; border: 0; border-radius: 10px; background: var(--btn-bg); color: var(--btn-fg); cursor: pointer; font-weight: 700; }
     button:hover { background: var(--btn-hover); }
     button.secondary { background: var(--btn-secondary); color: var(--btn-fg); }
     button.secondary:hover { background: var(--btn-secondary-hover); }
@@ -69,9 +83,18 @@
     .file-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .file-actions { display: flex; gap: 8px; }
     button.small { padding: 6px 10px; border-radius: 8px; font-size: 13px; }
-    a { color: #0a58ca; text-decoration: none; }
+    a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    code { background: #f4f4f4; padding: 2px 6px; border-radius: 6px; }
+    code { background: rgba(168, 85, 247, 0.12); padding: 2px 6px; border-radius: 8px; border: 1px solid rgba(168, 85, 247, 0.18); }
+
+    .section { border: 1px solid rgba(168, 85, 247, 0.22); border-radius: 14px; padding: 12px; margin-top: 12px; background: rgba(11, 15, 20, 0.22); }
+    .section h3 { margin: 0 0 8px; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .actions-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-start; margin-top: 12px; position: sticky; bottom: 12px; background: rgba(15, 22, 32, 0.92); padding: 10px; border: 1px solid rgba(168, 85, 247, 0.30); border-radius: 14px; backdrop-filter: blur(10px); }
+    .actions-bar .spacer { flex: 1; }
+    .tiny { font-size: 12px; padding: 6px 10px; }
+
+    .footer { margin-top: 18px; text-align: center; color: var(--muted); font-size: 13px; }
+    .footer strong { color: var(--fg); }
   </style>
 </head>
 <body>
@@ -95,47 +118,103 @@
     <div class="card">
       <h2>Procesar evidencias</h2>
       <form method="post" action="/run" id="runForm">
-        <div class="row">
-          <div>
-            <label>InputRoot</label>
-            <input name="input_root" value="{{ input_root }}" />
-            <div class="hint">Debe contener carpetas: <code>Evidencia 1</code>, <code>Evidencia 2</code>, etc.</div>
-          </div>
-          <div>
-            <label>OutputRoot</label>
-            <input name="output_root" value="{{ output_root }}" />
-            <div class="hint">Aquí se generan todos los CSV.</div>
+        <div class="section">
+          <h3>Rutas</h3>
+          <div class="row">
+            <div>
+              <label>InputRoot</label>
+              <input name="input_root" value="{{ input_root }}" />
+              <div class="hint">Carpetas: <code>Evidencia 1</code>, <code>Evidencia 2</code>, etc.</div>
+            </div>
+            <div>
+              <label>OutputRoot</label>
+              <input name="output_root" value="{{ output_root }}" />
+              <div class="hint">Salida de CSV.</div>
+            </div>
           </div>
         </div>
 
-        <label>MaxEvents (opcional)</label>
-        <input name="max_events" value="0" />
-        <div class="hint">0 = sin límite (puede tardar más).</div>
+        <div class="section">
+          <h3>Filtros</h3>
 
-        <label>¿Qué log procesar?</label>
-        <select name="logs_choice" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
-          <option value="all" selected>Todos</option>
-          <option value="security">Security (4688)</option>
-          <option value="powershell">PowerShell Operational (4103/4104/4105)</option>
-          <option value="sysmon">Sysmon Operational (1)</option>
-        </select>
+          <div class="row">
+            <div>
+              <label>¿Qué log procesar?</label>
+              <select name="logs_choice" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                <option value="all" selected>Todos</option>
+                <option value="security">Security (4688)</option>
+                <option value="powershell">PowerShell (4103/4104/4105)</option>
+                <option value="sysmon">Sysmon (1)</option>
+              </select>
+            </div>
+            <div>
+              <label>MaxEvents (opcional)</label>
+              <input name="max_events" value="0" />
+              <div class="hint">0 = sin límite.</div>
+            </div>
+          </div>
 
-        <div style="margin-top: 10px;">
-          <label style="display:flex; align-items:center; gap:8px; font-weight:600; margin:0;">
+          <div class="row" style="margin-top: 10px;">
+            <div>
+              <label>Inicio (opcional)</label>
+              <div class="row" style="grid-template-columns: 1.3fr 0.8fr 0.8fr 0.8fr;">
+                <input type="date" name="start_date" />
+                <select name="start_hour" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                  {% for h in range(1, 13) %}
+                    <option value="{{ h }}">{{ h }}</option>
+                  {% endfor %}
+                </select>
+                <select name="start_minute" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                  {% for m in range(0, 60) %}
+                    <option value="{{ '%02d'|format(m) }}" {% if m == 0 %}selected{% endif %}>{{ '%02d'|format(m) }}</option>
+                  {% endfor %}
+                </select>
+                <select name="start_ampm" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                  <option value="AM" selected>AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label>Fin (opcional)</label>
+              <div class="row" style="grid-template-columns: 1.3fr 0.8fr 0.8fr 0.8fr;">
+                <input type="date" name="end_date" />
+                <select name="end_hour" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                  {% for h in range(1, 13) %}
+                    <option value="{{ h }}">{{ h }}</option>
+                  {% endfor %}
+                </select>
+                <select name="end_minute" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                  {% for m in range(0, 60) %}
+                    <option value="{{ '%02d'|format(m) }}" {% if m == 0 %}selected{% endif %}>{{ '%02d'|format(m) }}</option>
+                  {% endfor %}
+                </select>
+                <select name="end_ampm" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                  <option value="AM" selected>AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions-bar">
+            <button type="submit" id="runBtn">Ejecutar extracción</button>
+            <button type="button" class="secondary" id="clearTimeBtn">Limpiar rango</button>
+            <div class="spacer"></div>
+            <button type="button" class="secondary" id="pauseBtn" style="display:none;">Pausar</button>
+            <button type="button" class="secondary" id="resumeBtn" style="display:none;">Reanudar</button>
+            <button type="button" class="danger" id="cancelBtn" style="display:none;">Cancelar</button>
+          </div>
+          <div class="hint">Rango filtra por <code>TimeCreated</code>. Si queda vacío, se procesa completo.</div>
+        </div>
+
+        <div class="section">
+          <h3>Opciones</h3>
+          <label style="display:flex; align-items:center; gap:8px; font-weight:700; margin:0;">
             <input type="checkbox" name="include_xml" id="includeXml" />
-            Incluir XML en el CSV (más pesado / más lento)
+            Incluir XML en el CSV
           </label>
-          <div class="hint">Recomendado: desactivado para mayor velocidad.</div>
-        </div>
-
-        <div style="margin-top: 12px;">
-          <button type="submit" id="runBtn">Ejecutar extracción</button>
-        </div>
-
-        <div style="margin-top: 10px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button type="button" class="secondary" id="pauseBtn" style="display:none;">Pausar</button>
-          <button type="button" class="secondary" id="resumeBtn" style="display:none;">Reanudar</button>
-          <button type="button" class="danger" id="cancelBtn" style="display:none;">Cancelar</button>
+          <div class="hint">Más pesado y más lento, pero conserva el XML completo por evento.</div>
         </div>
 
         <div class="progress-wrap" id="progressWrap" style="display:none;">
@@ -183,6 +262,8 @@
       </ul>
     </div>
 
+    <div class="footer">Created by <strong>Andysitoop</strong></div>
+
   </div>
 
   <script>
@@ -200,12 +281,32 @@
     const resumeBtn = document.getElementById('resumeBtn');
     const cancelBtn = document.getElementById('cancelBtn');
     const themeToggle = document.getElementById('themeToggle');
+    const clearTimeBtn = document.getElementById('clearTimeBtn');
+
+    if (clearTimeBtn) {
+      clearTimeBtn.addEventListener('click', () => {
+        const fields = [
+          'start_date', 'start_hour', 'start_minute', 'start_ampm',
+          'end_date', 'end_hour', 'end_minute', 'end_ampm',
+        ];
+        fields.forEach((name) => {
+          const el = document.querySelector(`[name="${name}"]`);
+          if (!el) return;
+          if (el.tagName === 'INPUT') el.value = '';
+          else if (el.tagName === 'SELECT') {
+            if (name.endsWith('_minute')) el.value = '00';
+            else if (name.endsWith('_ampm')) el.value = 'AM';
+            else if (name.endsWith('_hour')) el.value = '1';
+          }
+        });
+      });
+    }
 
     function applyTheme(theme) {
       const t = (theme === 'dark') ? 'dark' : 'light';
       if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
       else document.documentElement.removeAttribute('data-theme');
-      if (themeToggle) themeToggle.textContent = `Tema: ${t === 'dark' ? 'Oscuro' : 'Claro'}`;
+      if (themeToggle) themeToggle.textContent = `Tema: ${t === 'dark' ? 'Purple (Oscuro)' : 'Purple (Base)'}`;
     }
 
     const savedTheme = localStorage.getItem('evtx_hunter_theme');
@@ -333,13 +434,15 @@
           if (cancelBtn) cancelBtn.style.display = 'none';
 
           const results = data.results || [];
+          const engines = Array.from(new Set(results.map(r => r.engine).filter(Boolean)));
+          const engineNote = engines.length > 0 ? ` Motor: ${engines.join(', ')}.` : '';
           const zeros = results.filter(r => (r.exported === 0));
           const secWithCmd = results.filter(r => r.log === 'security' && r.cmdline_present === true);
           const psWithSb = results.filter(r => r.log === 'powershell_operational' && r.scriptblock_present === true);
           const psWithModule = results.filter(r => r.log === 'powershell_operational' && r.module_logging_present === true);
 
           if (zeros.length > 0) {
-            progressDetail.textContent = `Aviso: hay CSV con 0 eventos exportados (${zeros.length}). Revisa si el EVTX no contiene esos IDs.`;
+            progressDetail.textContent = `Aviso: hay CSV con 0 eventos exportados (${zeros.length}). Revisa si el EVTX no contiene esos IDs.${engineNote}`;
           } else {
             let note = 'Listo. Refresca la página para ver los CSV en la lista.';
             if (results.some(r => r.log === 'security')) {
@@ -356,7 +459,7 @@
                 : ' PowerShell (Module Logging/4103): no se detectó Payload.';
               note += ' Transcription: normalmente se guarda en archivos .txt fuera del EVTX (no se detecta aquí).';
             }
-            progressDetail.textContent = note;
+            progressDetail.textContent = note + engineNote;
           }
         } else if (st === 'error') {
           runBtn.disabled = false;

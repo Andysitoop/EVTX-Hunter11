@@ -2,6 +2,7 @@ import os
 import threading
 import time
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -23,6 +24,57 @@ _jobs: dict[str, dict] = {}
 
 def _now_ms() -> int:
     return int(time.time() * 1000)
+
+
+def _parse_user_datetime(value: str) -> Optional[datetime]:
+    v = (value or "").strip()
+    if not v:
+        return None
+
+    try:
+        dt = datetime.fromisoformat(v.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+    if dt.tzinfo is None:
+        local_tz = datetime.now().astimezone().tzinfo
+        dt = dt.replace(tzinfo=local_tz)
+
+    return dt.astimezone(timezone.utc)
+
+
+def _parse_user_datetime_12h(date_value: str, hour_value: str, minute_value: str, ampm_value: str) -> Optional[datetime]:
+    d = (date_value or "").strip()
+    if not d:
+        return None
+
+    try:
+        hour12 = int((hour_value or "").strip())
+        minute = int((minute_value or "").strip())
+    except ValueError:
+        return None
+
+    if hour12 < 1 or hour12 > 12:
+        return None
+    if minute < 0 or minute > 59:
+        return None
+
+    ampm = (ampm_value or "").strip().upper()
+    if ampm not in ("AM", "PM"):
+        return None
+
+    hour24 = hour12 % 12
+    if ampm == "PM":
+        hour24 += 12
+
+    try:
+        dt_naive = datetime.fromisoformat(f"{d}T{hour24:02d}:{minute:02d}:00")
+    except ValueError:
+        return None
+
+    local_tz = datetime.now().astimezone().tzinfo
+    dt_local = dt_naive.replace(tzinfo=local_tz)
+    return dt_local.astimezone(timezone.utc)
 
 
 def _new_job(initial: dict) -> str:
@@ -119,6 +171,23 @@ def run_extract():
     max_events_raw = request.form.get("max_events", "0")
     include_xml_raw = request.form.get("include_xml", "")
     logs_choice = (request.form.get("logs_choice") or "all").lower()
+    start_time = _parse_user_datetime_12h(
+        request.form.get("start_date") or "",
+        request.form.get("start_hour") or "",
+        request.form.get("start_minute") or "",
+        request.form.get("start_ampm") or "",
+    )
+    if start_time is None:
+        start_time = _parse_user_datetime(request.form.get("start_time") or "")
+
+    end_time = _parse_user_datetime_12h(
+        request.form.get("end_date") or "",
+        request.form.get("end_hour") or "",
+        request.form.get("end_minute") or "",
+        request.form.get("end_ampm") or "",
+    )
+    if end_time is None:
+        end_time = _parse_user_datetime(request.form.get("end_time") or "")
 
     try:
         max_events = int(max_events_raw)
@@ -148,6 +217,8 @@ def run_extract():
         "max_events": max_events,
         "include_xml": include_xml,
         "logs_choice": logs_choice,
+        "start_time": start_time.isoformat() if start_time else "",
+        "end_time": end_time.isoformat() if end_time else "",
     })
 
     def _worker() -> None:
@@ -168,6 +239,8 @@ def run_extract():
                 output_root=output_root,
                 max_events=max_events,
                 include_xml=include_xml,
+                start_time=start_time,
+                end_time=end_time,
                 progress_callback=_cb,
                 control=control,
                 logs_to_process=logs_to_process,
@@ -192,6 +265,8 @@ def api_start():
     max_events = int(data.get("max_events") or 0)
     include_xml = bool(data.get("include_xml"))
     logs_choice = str(data.get("logs_choice") or "all").lower()
+    start_time = _parse_user_datetime(str(data.get("start_time") or ""))
+    end_time = _parse_user_datetime(str(data.get("end_time") or ""))
 
     if logs_choice == "security":
         logs_to_process = {"security"}
@@ -212,6 +287,8 @@ def api_start():
         "max_events": max_events,
         "include_xml": include_xml,
         "logs_choice": logs_choice,
+        "start_time": start_time.isoformat() if start_time else "",
+        "end_time": end_time.isoformat() if end_time else "",
     })
 
     def _worker() -> None:
@@ -232,6 +309,8 @@ def api_start():
                 output_root=output_root,
                 max_events=max_events,
                 include_xml=include_xml,
+                start_time=start_time,
+                end_time=end_time,
                 progress_callback=_cb,
                 control=control,
                 logs_to_process=logs_to_process,
