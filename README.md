@@ -6,6 +6,16 @@ Manual de usuario para extraer eventos específicos desde archivos `.evtx` y exp
 
 El flujo recomendado es usar la **UI Web** (Flask). La **API** es opcional.
 
+## ¿Qué es EVTX Hunter y en qué puede ayudar?
+
+EVTX Hunter es una herramienta en Python con interfaz web (Flask) para **extraer y exportar eventos específicos** desde archivos **EVTX** (evidencia offline) hacia **CSV**, organizada por **equipo/evidencia**.
+
+Puede ayudarte a:
+
+- Centralizar la extracción de eventos relevantes (por ejemplo, Security, PowerShell y Sysmon) desde múltiples evidencias.
+- Acelerar el análisis inicial y el triage, generando CSV listos para filtrar/buscar.
+- Mantener consistencia en la recolección al aplicar filtros de EventID y rango de tiempo de forma repetible.
+
 ## Muestra (UI)
 
 ![Muestra de la herramienta](image/muestra.jpg)
