@@ -1,7 +1,16 @@
 # EVTX Hunter
+<<<<<<< HEAD
 
 ![EVTX Hunter](image/logo.jpeg)
 
+=======
+
+
+![EVTX Hunter](image/logo.jpeg)
+
+
+ 
+>>>>>>> ff0b4f5adce7a61818237347da5002fb9d0d91b7
 Manual de usuario para extraer eventos específicos desde archivos `.evtx` y exportarlos a `.csv`.
 
 El flujo recomendado es usar la **UI Web** (Flask). La **API** es opcional.
